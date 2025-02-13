@@ -1,5 +1,3 @@
-Web application built with Express.js
-
 ## Features
 
 - User Authentication (registration/login)
@@ -9,4 +7,15 @@ Web application built with Express.js
 - Secure Password Storage (bcrypt)
 - Secure User Session (JWT in httpOnly cookie)
 - Static Files Serving
-- Error Handling
+
+## Installation
+```bash
+git clone https://github.com/hayndehayn/PUG-EJS.git
+cd pugproj
+npm i
+```
+
+## Usage (in pugproj folder)
+```bash
+node server.js
+```

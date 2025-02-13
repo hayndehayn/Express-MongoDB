@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'H7d#k9L$mP2vR8nX@qW5sY4tA1zC6bE3'; // Replace with actual skibidi key
+const JWT_SECRET = 'H7d#k9L$mP2vR8nX@qW5sY4tA1zC6bE3'; // Replace with the actual skibidi key
 
 const authMiddleware = (req, res, next) => {
     const token = req.cookies.jwt;
