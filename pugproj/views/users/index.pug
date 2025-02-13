@@ -1,11 +1,22 @@
 doctype html
 html
-    head
-        title Список користувачів
-        link(rel="stylesheet", href="/styles.css")
-    body
-        h1 Список користувачів
-        ul
-            each user in users
-                li
-                    a(href=`/users/${user.id}`)= user.name
+  head
+    title User List
+    link(rel="stylesheet", href="/css/style.css")
+  body
+    h1 Users List
+    table
+      thead
+        tr
+          th ID
+          th Name
+          th Email
+          th Actions
+      tbody
+        each user in users
+          tr
+            td= user.id
+            td= user.name
+            td= user.email
+            td
+              a(href=`/users/${user.id}`) View Details

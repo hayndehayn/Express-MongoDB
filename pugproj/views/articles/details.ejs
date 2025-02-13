@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Деталі статті</title>
-    <link rel="stylesheet" href="/styles.css">
+    <title>Article Details</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <h1><%= article.title %></h1>
-    <p><%= article.content %></p>
-    <a href="/articles">Назад до списку</a>
+    <div class="article-content">
+        <p><%= article.content %></p>
+    </div>
+    <a href="/articles">Back to Articles List</a>
 </body>
 </html>
