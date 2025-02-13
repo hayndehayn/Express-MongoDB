@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+    title Login
+    link(rel="stylesheet", href="/css/style.css")
+    link(rel="icon", href="/favicon.ico")
+  body
+    h1 Login
+    if error
+      p.error= error
+    form(action="/login" method="POST")
+      div
+        label(for="email") Email:
+        input(type="email" id="email" name="email" required)
+      div
+        label(for="password") Password:
+        input(type="password" id="password" name="password" required)
+      button(type="submit") Login
+    p
+      | Don't have an account? 
+      a(href="/register") Register here

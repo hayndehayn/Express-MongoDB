@@ -1,12 +1,30 @@
+/* Theme variables */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --link-color: #0066cc;
+    --border-color: #dddddd;
+}
+
+/* Dark theme */
+html.dark {
+    --bg-color: #333333;
+    --text-color: #ffffff;
+    --link-color: #66b3ff;
+    --border-color: #666666;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
     line-height: 1.6;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 h1 {
-    color: #333;
+    color: var(--text-color);
 }
 
 table {
@@ -17,16 +35,16 @@ table {
 
 th, td {
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     text-align: left;
 }
 
 th {
-    background-color: #f5f5f5;
+    background-color: var(--border-color);
 }
 
 a {
-    color: #0066cc;
+    color: var(--link-color);
     text-decoration: none;
 }
 
@@ -37,27 +55,81 @@ a:hover {
 .user-details {
     margin: 20px 0;
     padding: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
 }
 
-.articles {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-}
-
-.article {
-    border: 1px solid #ddd;
-    padding: 15px;
-    border-radius: 4px;
-}
-
-.article h2 {
-    margin-top: 0;
-    color: #333;
-}
-
-.article-content {
+.theme-selector {
     margin: 20px 0;
+}
+
+.theme-selector button {
+    margin-right: 10px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.theme-selector button:hover {
+    background-color: var(--border-color);
+}
+
+/* Form styles */
+form {
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--link-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    opacity: 0.9;
+}
+
+.error {
+    color: #ff0000;
+    margin-bottom: 15px;
+}
+
+nav {
+    margin-bottom: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+nav a {
+    margin-left: 15px;
+}
+
+nav span {
+    color: var(--text-color);
 }

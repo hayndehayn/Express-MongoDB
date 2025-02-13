@@ -1,9 +1,19 @@
 doctype html
-html
+html(class=theme)
   head
     title User List
     link(rel="stylesheet", href="/css/style.css")
+    link(rel="icon", href="/favicon.ico")
   body
+    nav
+      if user
+        span Welcome, #{user.name}
+        a(href="/logout") Logout
+      else
+        a(href="/login") Login
+    div.theme-selector
+      button(onclick="changeTheme('light')") Light Theme
+      button(onclick="changeTheme('dark')") Dark Theme
     h1 Users List
     table
       thead
@@ -20,3 +30,4 @@ html
             td= user.email
             td
               a(href=`/users/${user.id}`) View Details
+    script(src="/js/theme.js")
