@@ -1,24 +1,37 @@
-doctype html
-html
-  head
-    title Register
-    link(rel="stylesheet", href="/css/style.css")
-    link(rel="icon", href="/favicon.ico")
-  body
+extends ../layout
+
+block content
+  .auth-container
     h1 Register
-    if error
-      p.error= error
-    form(action="/register" method="POST")
-      div
-        label(for="name") Name:
-        input(type="text" id="name" name="name" required)
-      div
-        label(for="email") Email:
-        input(type="email" id="email" name="email" required)
-      div
-        label(for="password") Password:
-        input(type="password" id="password" name="password" required)
-      button(type="submit") Register
-    p
-      | Already have an account? 
-      a(href="/login") Login here
+    if error && error.length > 0
+      .error-message= error
+    if success_msg && success_msg.length > 0
+      .success-message= success_msg
+    form.auth-form(action="/register", method="POST", autocomplete="off")
+      .form-group
+        label(for="email") Email
+        input#email(type="email", name="email", required)
+      .form-group
+        label(for="password") Password
+        input#password(type="password", name="password", required, minlength="6")
+      button.btn.btn-primary(type="submit") Register
+      .auth-links
+        a(href="/login") Already have an account? Login
+
+  script.
+    document.querySelector('.auth-form').addEventListener('submit', function(e) {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      if (!email || !password) {
+        e.preventDefault();
+        alert('Please fill in all fields');
+        return;
+      }
+      
+      if (password.length < 6) {
+        e.preventDefault();
+        alert('Password must be at least 6 characters long');
+        return;
+      }
+    });

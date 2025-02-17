@@ -1,0 +1,17 @@
+doctype html
+html(class=theme)
+  head
+    title= title || 'Pugg App'
+    link(rel="stylesheet", href="/css/style.css")
+    link(rel="stylesheet", href="/css/auth.css")
+    link(rel="icon", href="/favicon.ico")
+  body
+    nav.navbar
+      if user
+        span Welcomeee, #{user.email}
+        a(href="/logout") Logout
+      else
+        a(href="/login") Login
+        a(href="/register") Register
+    .container
+      block content

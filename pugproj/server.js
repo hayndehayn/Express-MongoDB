@@ -1,149 +1,159 @@
-const express = require("express");
-const path = require("path");
+const express = require('express');
+const path = require('path');
+const session = require('express-session');
+const { passport, users } = require('./config/passport');
+const { ensureAuthenticated } = require('./middleware/auth');
 const cookieParser = require('cookie-parser');
-const jwt = require('jsonwebtoken');
+const flash = require('connect-flash');
 const bcrypt = require('bcryptjs');
-const { authMiddleware, JWT_SECRET } = require('./middleware/auth');
 
 const app = express();
 const port = 3000;
+
+
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash());
 
 // View engine setup
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
-app.engine('pug', require('pug').__express);
-app.engine('ejs', require('ejs').__express);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
-// Static files
-app.use(express.static("public"));
-
-// Mock database
-const users = [
-    { id: 1, name: "John Smith", email: "john@example.com", password: '$2a$10$XbzWykIwNqYLF8LZk6H3p.xqB1P7E0RxqNO5G3ZOC8Z9ZK3nFH3Hy' }, // password: "password123"
-    { id: 2, name: "Jane Doe", email: "jane@example.com", password: '$2a$10$XbzWykIwNqYLF8LZk6H3p.xqB1P7E0RxqNO5G3ZOC8Z9ZK3nFH3Hy' },
-    { id: 3, name: "Robert Johnson", email: "robert@example.com", password: '$2a$10$XbzWykIwNqYLF8LZk6H3p.xqB1P7E0RxqNO5G3ZOC8Z9ZK3nFH3Hy' },
-];
-
-// Auth routes
-app.get('/login', (req, res) => {
-    res.render('auth/login');
-});
-
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(u => u.email === email);
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-        return res.render('auth/login', { error: 'Invalid email or password' });
+// Session config
+app.use(session({
+    secret: 'H7d#k9L$mP2vR8nX@qW5sY4tA1zC6bE3',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: false, // set to true in production with HTTPS
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
+}));
 
-    const token = jwt.sign({ id: user.id, name: user.name, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // 24 hours
-    res.redirect('/users');
+// Passport init
+app.use(passport.initialize());
+app.use(passport.session());
+
+// flash messages to all routes
+app.use((req, res, next) => {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    res.locals.user = req.user || null;
+    next();
 });
 
-app.get('/register', (req, res) => {
-    res.render('auth/register');
+// Routes
+app.get("/", (req, res) => {
+    res.redirect("/login");
+});
+
+app.get("/login", (req, res) => {
+    if (req.user) {
+        return res.redirect('/protected');
+    }
+    res.render("auth/login", { 
+        title: 'Login',
+        error: req.flash('error'),
+        success_msg: req.flash('success_msg')
+    });
+});
+
+app.get("/register", (req, res) => {
+    if (req.user) {
+        return res.redirect('/protected');
+    }
+    res.render("auth/register", { 
+        title: 'Register',
+        error: req.flash('error')
+    });
 });
 
 app.post('/register', async (req, res) => {
-    const { name, email, password } = req.body;
-    
-    if (users.some(u => u.email === email)) {
-        return res.render('auth/register', { error: 'Email already registered' });
+    try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+            req.flash('error', 'Please provide both email and password');
+            return res.redirect('/register');
+        }
+
+        if (password.length < 6) {
+            req.flash('error', 'Password must be at least 6 characters long');
+            return res.redirect('/register');
+        }
+        
+        // Check if user already exists
+        const existingUser = users.find(u => u.email === email);
+        if (existingUser) {
+            req.flash('error', 'Email already registered');
+            return res.redirect('/register');
+        }
+
+        // Create new user
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = {
+            id: users.length + 1,
+            email,
+            password: hashedPassword
+        };
+        users.push(newUser);
+
+        req.flash('success_msg', 'You are now registered and can log in');
+        res.redirect('/login');
+    } catch (error) {
+        console.error('Registration error:', error);
+        req.flash('error', 'Error during registration');
+        res.redirect('/register');
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = {
-        id: users.length + 1,
-        name,
-        email,
-        password: hashedPassword
-    };
-    users.push(newUser);
-
-    const token = jwt.sign({ id: newUser.id, name: newUser.name, email: newUser.email }, JWT_SECRET, { expiresIn: '24h' });
-    res.cookie('jwt', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }); // 24 hours
-    res.redirect('/users');
 });
 
-app.get('/logout', (req, res) => {
-    res.clearCookie('jwt');
-    res.redirect('/login');
+app.post('/login', (req, res, next) => {
+    passport.authenticate('local', {
+        successRedirect: '/protected',
+        failureRedirect: '/login',
+        failureFlash: true
+    })(req, res, next);
 });
 
-// Theme route
-app.post('/theme', (req, res) => {
-    const { theme } = req.body;
-    res.cookie('theme', theme, { maxAge: 365 * 24 * 60 * 60 * 1000 }); // 1 year
-    res.json({ success: true });
+app.get('/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) { return next(err); }
+        res.redirect('/login');
+    });
 });
 
 // Protected routes
-app.get("/", (req, res) => {
-    res.redirect("/users");
-});
-
-app.get("/users", authMiddleware, (req, res) => {
-    res.render("users/index", { 
-        users,
+app.get("/protected", ensureAuthenticated, (req, res) => {
+    res.render('protected', { 
+        title: 'Protected Page',
         user: req.user,
         theme: req.cookies.theme || 'light'
     });
 });
 
-app.get("/users/:userId", authMiddleware, (req, res) => {
+app.get("/users/:userId", ensureAuthenticated, (req, res) => {
     const userId = parseInt(req.params.userId);
-    const user = users.find(u => u.id === userId);
+    const userDetails = users.find(u => u.id === userId);
     
-    if (!user) {
+    if (!userDetails) {
         return res.status(404).send('User not found');
     }
-    
+
     res.render("users/details", { 
-        user,
-        currentUser: req.user,
-        theme: req.cookies.theme || 'light'
-    });
-});
-
-// EJS routes
-app.get("/articles", authMiddleware, (req, res) => {
-    const articles = [
-        { id: 1, title: "What is Node.js?", content: "Node.js is..." },
-        { id: 2, title: "Using Express", content: "Express is..." },
-        {
-            id: 3,
-            title: "PUG and EJS Templating Engines",
-            content: "PUG and EJS are...",
-        },
-    ];
-    res.render("articles/index", { 
-        articles,
+        title: 'User Details',
+        userDetails,
         user: req.user,
         theme: req.cookies.theme || 'light'
     });
 });
 
-app.get("/articles/:articleId", authMiddleware, (req, res) => {
-    const articleId = parseInt(req.params.articleId);
-    const article = {
-        id: articleId,
-        title: "What is Node.js?",
-        content: "Node.js is...",
-    };
-    res.render("articles/details", { 
-        article,
-        user: req.user,
-        theme: req.cookies.theme || 'light'
-    });
-});
-
+// Start server
 app.listen(port, () => {
-    console.log(`Server started at http://localhost:${port}`);
+    console.log(`Server is running on port ${port}`);
 });
