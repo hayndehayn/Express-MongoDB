@@ -13,4 +13,15 @@ Web application built with Express.js + Passport.js
 - Dual Template Engines (Pug & EJS)
 - Secure Password Storage (bcrypt)
 - Static Files Serving
-- Error Handling
+
+## Installation
+```bash
+git clone https://github.com/hayndehayn/PUG-EJS.git
+cd pugproj
+npm i
+```
+
+## Usage (in pugproj folder)
+```bash
+node server.js
+```
