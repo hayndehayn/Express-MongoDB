@@ -14,7 +14,6 @@ const port = process.env.PORT || 3000;
 
 const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_DB_NAME;
-
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Connect to MongoDB
@@ -25,7 +24,7 @@ async function connectToMongo() {
         
         const db = client.db(dbName);
         
-        // Створюємо тестову колекцію та додаємо тестовий документ
+        // Test collection 
         const testCollection = db.collection('test_collection');
         await testCollection.insertOne({
             message: "Test connection",
@@ -35,7 +34,7 @@ async function connectToMongo() {
         
         console.log('Test document inserted successfully');
         
-        // Перевіряємо з'єднання через простий запит
+        // Connection check
         const collections = await db.listCollections().toArray();
         console.log('Available collections:', collections.map(c => c.name));
         
