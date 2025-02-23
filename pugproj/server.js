@@ -6,11 +6,59 @@ const { ensureAuthenticated } = require('./middleware/auth');
 const cookieParser = require('cookie-parser');
 const flash = require('connect-flash');
 const bcrypt = require('bcryptjs');
+const { MongoClient } = require('mongodb');
+require('dotenv').config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
+const uri = process.env.MONGODB_URI;
+const dbName = process.env.MONGODB_DB_NAME;
 
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Connect to MongoDB
+async function connectToMongo() {
+    try {
+        await client.connect();
+        console.log('Successfully connected to MongoDB Atlas');
+        
+        const db = client.db(dbName);
+        
+        // Створюємо тестову колекцію та додаємо тестовий документ
+        const testCollection = db.collection('test_collection');
+        await testCollection.insertOne({
+            message: "Test connection",
+            timestamp: new Date(),
+            status: "active"
+        });
+        
+        console.log('Test document inserted successfully');
+        
+        // Перевіряємо з'єднання через простий запит
+        const collections = await db.listCollections().toArray();
+        console.log('Available collections:', collections.map(c => c.name));
+        
+        return db;
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        process.exit(1);
+    }
+}
+
+// Connect to MongoDB
+let db;
+connectToMongo()
+    .then((database) => {
+        db = database;
+    })
+    .catch(console.error);
+
+// Shutdown
+process.on('SIGINT', async () => {
+    await client.close();
+    process.exit();
+});
 
 // Middleware
 app.use(express.json());
