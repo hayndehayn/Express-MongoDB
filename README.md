@@ -1,4 +1,4 @@
-Web application built with Express.js + Passport.js
+Web application built with Express.js + Passport.js including cursor operations and aggregation pipelines
 
 ## Features
 
@@ -10,9 +10,15 @@ Web application built with Express.js + Passport.js
 - User Authentication (registration/login)
 - Route Protection (authentication required)
 - Theme Switching (light/dark)
-- Dual Template Engines (Pug & EJS)
 - Secure Password Storage (bcrypt)
 - Static Files Serving
+- CRUD operations
+
+### Basic CRUD Operations
+- Create: `insertOne` and `insertMany`
+- Read: `find` with projections
+- Update: `updateOne`, `updateMany`, and `replaceOne`
+- Delete: `deleteOne` and `deleteMany`
 
 ## Installation
 ```bash
