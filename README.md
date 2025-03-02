@@ -1,33 +1,39 @@
-Web application built with Express.js + Passport.js including cursor operations and aggregation pipelines
+# Express.js + Mongoose Authentication System
 
-## Features
+Simple login/register page with authentication and session management.
 
-- Passport.js Integration
-- Local Strategy (email/password)
+## Technologies Used
+
+- **Backend Framework**: Express.js
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: Passport.js
+- **Template Engine**: Pug
+- **Session Management**: express-session
+- **Password Hashing**: bcrypt
+
+## Authentication & Security
+- User Registration and Login
 - Session-based Authentication
-- Flash Messages for User Feedback
+- Password Hashing with bcrypt
+- Protected Routes
 - HTTP-Only Cookies
-- User Authentication (registration/login)
-- Route Protection (authentication required)
-- Theme Switching (light/dark)
-- Secure Password Storage (bcrypt)
-- Static Files Serving
-- CRUD operations
+- Flash Messages for User Feedback
 
-### Basic CRUD Operations
-- Create: `insertOne` and `insertMany`
-- Read: `find` with projections
-- Update: `updateOne`, `updateMany`, and `replaceOne`
-- Delete: `deleteOne` and `deleteMany`
+---
 
-## Installation
+### Installation and usage
 ```bash
-git clone https://github.com/hayndehayn/PUG-EJS.git
+git clone https://github.com/hayndehayn/Express-MongoDB.git
 cd pugproj
 npm i
+node server.js
 ```
 
-## Usage (in pugproj folder)
+---
+
+### Enviroment-variables in .env file
 ```bash
-node server.js
+MONGODB_URI=your_mongodb_connection_string
+SESSION_SECRET=your_session_secret
+PORT=3000
 ```
